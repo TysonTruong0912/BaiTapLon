@@ -156,6 +156,69 @@ void deleteBorrow(ListBorrow *l, char idSV[]){
 	} 
 	previous->next = p->next;
 	free(p); 
-} 
+}
+// Ghi file Reader
+void writeReaderToFile(ListReader l, char filename[]){
+    FILE *f = fopen(filename, "w");
+    if(f == NULL){
+        printf("Khong mo duoc file!");
+        return;
+    }
 
+    for(NodeReader *p = l.head; p != NULL; p = p->next){
+        fprintf(f, "%s|%s\n", p->data.idSV, p->data.tenSV);
+    }
 
+    fclose(f);
+    printf("Da ghi file Reader thanh cong!\n");
+}
+// Ghi file Borrow
+void writeBorrowToFile(ListBorrow l, char filename[]){
+    FILE *f = fopen(filename, "w");
+    if(f == NULL){
+        printf("Khong mo duoc file!");
+        return;
+    }
+    for(NodeBorrow *p = l.head; p != NULL; p = p->next){
+        fprintf(f, "%s|%s|%s|%s\n",
+            p->data.idSach,
+            p->data.idSinhVien,
+            p->data.ngayMuon,
+            p->data.ngayTra
+        );
+    }
+    fclose(f);
+    printf("Da ghi file Borrow thanh cong!\n");
+}
+// Doc file Reader
+void readReaderFromFile(ListReader *l, char filename[]){
+    FILE *f = fopen(filename, "r");
+    if(f == NULL){
+        printf("Khong mo duoc file!");
+        return;
+    }
+    Reader r;
+    while(fscanf(f, "%[^|]|%[^\n]\n", r.idSV, r.tenSV) != EOF){
+        insertReader(l, r);
+    }
+    fclose(f);
+    printf("Da doc file Reader thanh cong!\n");
+}
+// Doc file Borrow
+void readBorrowFromFile(ListBorrow *l, char filename[]){
+    FILE *f = fopen(filename, "r");
+    if(f == NULL){
+        printf("Khong mo duoc file!");
+        return;
+    }
+    Borrow b;
+    while(fscanf(f, "%[^|]|%[^|]|%[^|]|%[^\n]\n",
+        b.idSach,
+        b.idSinhVien,
+        b.ngayMuon,
+        b.ngayTra) != EOF){
+        insertBorrow(l, b);
+    }
+    fclose(f);
+    printf("Da doc file Borrow thanh cong!\n");
+}
