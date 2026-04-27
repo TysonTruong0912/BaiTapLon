@@ -1,2 +1,108 @@
-# BaiTapLon
-Hệ thống quản lý thư viện
+void menu(ListReader *lr, ListBorrow *lb){
+    int choice;
+
+    do{
+        printf("\n========== MENU ==========\n");
+        printf("1. Them sach\n");
+        printf("2. Hien thi danh sach sach\n");
+        printf("3. Tim sach theo ID\n");
+
+        printf("4. Hien thi Reader\n");
+        printf("5. Hien thi Borrow\n");
+
+        printf("6. Muon sach\n");
+
+        printf("7. Doc file\n");
+        printf("8. Ghi file\n");
+
+        printf("0. Thoat\n");
+        printf("Chon: ");
+        scanf("%d", &choice);
+        getchar();
+
+        switch(choice){
+            case 1:{
+                int n;
+                printf("Nhap so sach: ");
+                scanf("%d", &n);
+                getchar();
+                themSach(n);
+                break;
+            }
+
+            case 2:
+                hienThi();
+                break;
+
+            case 3:
+                timTheoID();
+                break;
+
+            case 4:
+                showReaderList(*lr);
+                break;
+
+            case 5:
+                showBorrowList(*lb);
+                break;
+
+            case 6:{ // MUON SACH
+                Borrow b;
+                printf("Nhap ID sach: ");
+                scanf("%s", b.idSach);
+
+                printf("Nhap ID sinh vien: ");
+                scanf("%s", b.idSinhVien);
+
+                getchar();
+                printf("Nhap ngay muon: ");
+                fgets(b.ngayMuon, sizeof(b.ngayMuon), stdin);
+                b.ngayMuon[strcspn(b.ngayMuon, "\n")] = 0;
+
+                printf("Nhap ngay tra: ");
+                fgets(b.ngayTra, sizeof(b.ngayTra), stdin);
+                b.ngayTra[strcspn(b.ngayTra, "\n")] = 0;
+
+                insertBorrow(lb, b);
+
+                printf("Muon sach thanh cong!\n");
+                break;
+            }
+
+            case 7:{ // DOC FILE
+                initReaderList(lr);
+                initBorrowList(lb);
+
+                readReaderFromFile(lr, "reader.txt");
+                readBorrowFromFile(lb, "borrow.txt");
+
+                break;
+            }
+
+            case 8:{ // GHI FILE
+                writeReaderToFile(*lr, "reader.txt");
+                writeBorrowToFile(*lb, "borrow.txt");
+                break;
+            }
+
+            case 0:
+                printf("Thoat chuong trinh!\n");
+                break;
+
+            default:
+                printf("Lua chon khong hop le!\n");
+        }
+
+    }while(choice != 0);
+}
+int main(){
+    ListReader lr;
+    ListBorrow lb;
+
+    initReaderList(&lr);
+    initBorrowList(&lb);
+
+    menu(&lr, &lb);
+
+    return 0;
+}
