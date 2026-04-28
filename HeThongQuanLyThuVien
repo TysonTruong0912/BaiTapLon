@@ -156,6 +156,25 @@ void showReaderList(ListReader l) {
     } 
 }
 
+void deleteReader(ListReader *l, char id[]){
+	NodeReader *p = l->head;
+    NodeReader *previous = NULL; 
+	if(strcmp(p->data.idSV, id) == 0){
+		l->head = p->next;
+		free(p);
+		return; 
+	} 
+	while(p != NULL && strcmp(p->data.idSV, id) != 0){
+		previous = p;
+		p = p->next; 
+	} 
+	if(p == NULL){
+		printf("Khong tim thay phan tu de xoa");
+		return; 
+	} 
+	previous->next = p->next;
+	free(p); 
+} 
 //============ BORROW ============
 void initBorrowList(ListBorrow *l) {
     l->head = NULL; 
@@ -195,6 +214,26 @@ void showBorrowList(ListBorrow l) {
                i->data.ngayTra);
     }
 }
+
+void deleteBorrow(ListBorrow *l, char idSV[]){
+	NodeBorrow *p = l->head;
+    NodeBorrow *previous = NULL; 
+	if(strcmp(p->data.idSinhVien, idSV) == 0){
+		l->head = p->next;
+		free(p);
+		return; 
+	} 
+	while(p != NULL && strcmp(p->data.idSinhVien, idSV) != 0){
+		previous = p;
+		p = p->next; 
+	} 
+	if(p == NULL){
+		printf("Khong tim thay phan tu can xoa");
+		return; 
+	} 
+	previous->next = p->next;
+	free(p); 
+} 
 
 //============ MENU ============
 void menu(ListReader *lr, ListBorrow *lb) {
