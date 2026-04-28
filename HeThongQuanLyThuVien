@@ -1,43 +1,36 @@
 #include<stdio.h>
 #include<string.h>
-#include <stdlib.h>
+#include<stdlib.h>
+
 typedef struct {
     int id;
     char tensach[100];
     int soLuong;
 } Sach;
 
-   Sach ds[100];
-    int h = 0;
-    
-
-
+Sach ds[100];
+int h = 0;
 
 void themSach(int n) {
-	  for(int i =0; i < n; i++) {
-    printf("\nNhap ID: ");
-    scanf("%d", &ds[i].id);
-    getchar();
+    for(int i = 0; i < n; i++) {
+        printf("\nNhap ID: ");
+        scanf("%d", &ds[h].id);
+        getchar();
 
-    printf("Nhap ten sach: ");
-    fgets(ds[h].tensach, sizeof(ds[h].tensach), stdin);
-    ds[h].tensach[strcspn(ds[h].tensach, "\n")] = 0;
+        printf("Nhap ten sach: ");
+        fgets(ds[h].tensach, sizeof(ds[h].tensach), stdin);
+        ds[h].tensach[strcspn(ds[h].tensach, "\n")] = 0;
 
-  
+        printf("Nhap so luong: ");
+        scanf("%d", &ds[h].soLuong);
 
-    printf("Nhap so luong: ");
-    scanf("%d", &ds[h].soLuong);
-   
-    h++;
-
-  ;}
-    
-    printf(" Them thanh cong!\n");
+        h++;
+    }
+    printf("Them thanh cong!\n");
 }
 
-
 void hienThi() {
-    if( h== 0) {
+    if(h == 0) {
         printf("\nDanh sach rong!\n");
         return;
     }
@@ -46,11 +39,9 @@ void hienThi() {
     for(int i = 0; i < h; i++) {
         printf("\nID: %d", ds[i].id);
         printf("\nTen sach: %s", ds[i].tensach);
-     
         printf("\nSo luong: %d\n", ds[i].soLuong);
     }
 }
-
 
 void timTheoID() {
     int id;
@@ -64,7 +55,6 @@ void timTheoID() {
             printf("\n    Sach tim thay    \n");
             printf("ID: %d\n", ds[i].id);
             printf("Ten: %s\n", ds[i].tensach);
-         
             printf("So luong: %d\n", ds[i].soLuong);
             tim = 1;
         }
@@ -74,227 +64,248 @@ void timTheoID() {
         printf("Khong tim thay sach!\n");
     }
 }
+
 //===== MUON SACH =====
-typedef struct{
-	char idSach[50];
-	char idSinhVien[50];
-	char ngayMuon[50];
-	char ngayTra[50]; 
-}Borrow;
+typedef struct {
+    char idSach[50];
+    char idSinhVien[50];
+    char ngayMuon[50];
+    char ngayTra[50]; 
+} Borrow;
 
 //===== NODE READER =====
-typedef struct NodeReader{
-	Reader data;
-	struct NodeReader *next; 
-}NodeReader;
+typedef struct {
+    char idSV[50];
+    char tenSV[100];
+} Reader;
+
+typedef struct NodeReader {
+    Reader data;
+    struct NodeReader *next; 
+} NodeReader;
 
 //===== NODE BORROW =====
-typedef struct NodeBorrow{
-	Borrow data;
-	struct NodeBorrow *next; 
-}NodeBorrow;
+typedef struct NodeBorrow {
+    Borrow data;
+    struct NodeBorrow *next; 
+} NodeBorrow;
 
 //===== DANH SACH =====
 typedef struct {
-	NodeReader *head; 
-}ListReader;
+    NodeReader *head; 
+} ListReader;
+
 typedef struct {
-	NodeBorrow *head; 
-}ListBorrow;
+    NodeBorrow *head; 
+} ListBorrow;
 
 //============ READER ============
-void initReaderList(ListReader *l){
-	l->head = NULL; 
-} 
+void initReaderList(ListReader *l) {
+    l->head = NULL; 
+}
 
-NodeReader *createReader(Reader r){
-	NodeReader *p= (NodeReader*)malloc(sizeof(NodeReader));
-	if(p == NULL){
-		printf("cap phat vung nho khong thanh cong"); 
-	} 
-	else{
-	    p->data = r;
-	    p->next = NULL;
+NodeReader *createReader(Reader r) {
+    NodeReader *p = (NodeReader*)malloc(sizeof(NodeReader));
+    if(p == NULL) {
+        printf("cap phat vung nho khong thanh cong"); 
+    } else {
+        p->data = r;
+        p->next = NULL;
     }
     return p; 
-} 
-
-void insertReader(ListReader *l, Reader r){
-	NodeReader *p= createReader(r);
-	if(l->head == NULL){
-		l->head = p; 
-		return; 
-	} 
-	NodeReader *temp= l->head;
-	while(temp->next != NULL){
-		temp = temp->next; 
-	} 
-	temp->next = p; 
-} 
-
-void showReaderList(ListReader l){
-	for(NodeReader *i = l.head; i != NULL; i = i->next){
-		printf("\n%s - %s", i->data.idSV, i->data.tenSV); 
-	} 
-} 
-
-NodeReader *findReader(ListReader l, char id[]){
-	NodeReader *p = l.head;
-	while(p != NULL){
-		if(strcmp(p->data.idSV, id) == 0){
-			return p; 
-		} 
-		p = p->next; 
-	}
-	return NULL; 
-} 
-
-void deleteReader(ListReader *l, char id[]){
-	NodeReader *p = l->head, *previous = NULL; 
-	if(strcmp(p->data.idSV, id) == 0){
-		l->head = p->next;
-		free(p);
-		return; 
-	} 
-	while(p != NULL && strcmp(p->data.idSV, id) != 0){
-		previous = p;
-		p = p->next; 
-	} 
-	if(p == NULL){
-		printf("Khong tim thay phan tu de xoa");
-		return; 
-	} 
-	previous->next = p->next;
-	free(p); 
-} 
-
-// ============ BORROW ============
-void initBorrowList(ListBorrow *l){
-	l->head = NULL; 
-} 
-
-NodeBorrow *createBorrow(Borrow b){
-	NodeBorrow *p= (NodeBorrow*)malloc(sizeof(NodeBorrow));
-	if(p == NULL){
-		printf("cap phat vung nho khong thanh cong"); 
-	} 
-	else{
-	    p->data = b;
-	    p->next = NULL;
-    }
-    return p; 
-} 
-
-void insertBorrow(ListBorrow *l, Borrow b){
-	NodeBorrow *p= createBorrow(b);
-	if(l->head == NULL){
-		l->head = p; 
-		return; 
-	} 
-	NodeBorrow *temp= l->head;
-	while(temp->next != NULL){
-		temp = temp->next; 
-	} 
-	temp->next = p; 
-} 
-
-void showBorrowList(ListBorrow l){
-	for(NodeBorrow *i = l.head; i != NULL; i = i->next){
-		printf("\n%s - %s - %s - %s\n", i->data.idSach, i->data.idSinhVien, i->data.ngayMuon, i->data.ngayTra); 
-	} 
-} 
-
-NodeBorrow *findBorrow(ListBorrow l, char idSV[]){
-	NodeBorrow *p = l.head;
-	while(p != NULL){
-		if(strcmp(p->data.idSinhVien, idSV) == 0){
-			return p; 
-		} 
-		p = p->next; 
-	}
-	return NULL; 
-} 
-
-void deleteBorrow(ListBorrow *l, char idSV[]){
-	NodeBorrow *p = l->head, *previous = NULL; 
-	if(strcmp(p->data.idSinhVien, idSV) == 0){
-		l->head = p->next;
-		free(p);
-		return; 
-	} 
-	while(p != NULL && strcmp(p->data.idSinhVien, idSV) != 0){
-		previous = p;
-		p = p->next; 
-	} 
-	if(p == NULL){
-		printf("Khong tim thay phan tu can xoa");
-		return; 
-	} 
-	previous->next = p->next;
-	free(p); 
 }
-// Ghi file Reader
-void writeReaderToFile(ListReader l, char filename[]){
-    FILE *f = fopen(filename, "w");
-    if(f == NULL){
-        printf("Khong mo duoc file!");
-        return;
+
+void insertReader(ListReader *l, Reader r) {
+    NodeReader *p = createReader(r);
+    if(l->head == NULL) {
+        l->head = p; 
+        return; 
     }
 
-    for(NodeReader *p = l.head; p != NULL; p = p->next){
-        fprintf(f, "%s|%s\n", p->data.idSV, p->data.tenSV);
+    NodeReader *temp = l->head;
+    while(temp->next != NULL) {
+        temp = temp->next; 
     }
+    temp->next = p; 
+}
 
-    fclose(f);
-    printf("Da ghi file Reader thanh cong!\n");
-}
-// Ghi file Borrow
-void writeBorrowToFile(ListBorrow l, char filename[]){
-    FILE *f = fopen(filename, "w");
-    if(f == NULL){
-        printf("Khong mo duoc file!");
-        return;
-    }
-    for(NodeBorrow *p = l.head; p != NULL; p = p->next){
-        fprintf(f, "%s|%s|%s|%s\n",
-            p->data.idSach,
-            p->data.idSinhVien,
-            p->data.ngayMuon,
-            p->data.ngayTra
-        );
-    }
-    fclose(f);
-    printf("Da ghi file Borrow thanh cong!\n");
-}
-// Doc file Reader
-void readReaderFromFile(ListReader *l, char filename[]){
-    FILE *f = fopen(filename, "r");
-    if(f == NULL){
-        printf("Khong mo duoc file!");
-        return;
-    }
-    Reader r;
-    while(fscanf(f, "%[^|]|%[^\n]\n", r.idSV, r.tenSV) != EOF){
+void themReader(ListReader *l) {
+    char tiepTuc;
+    do {
+        Reader r;
+
+        printf("\nNhap ID sinh vien: ");
+        fgets(r.idSV, sizeof(r.idSV), stdin);
+        r.idSV[strcspn(r.idSV, "\n")] = 0;
+
+        printf("Nhap ten sinh vien: ");
+        fgets(r.tenSV, sizeof(r.tenSV), stdin);
+        r.tenSV[strcspn(r.tenSV, "\n")] = 0;
+
         insertReader(l, r);
-    }
-    fclose(f);
-    printf("Da doc file Reader thanh cong!\n");
+        printf("Them Reader thanh cong! Tiep tuc them? (y/n): ");
+        scanf("%c", &tiepTuc);
+        getchar();
+
+    } while(tiepTuc == 'y' || tiepTuc == 'Y');
 }
-// Doc file Borrow
-void readBorrowFromFile(ListBorrow *l, char filename[]){
-    FILE *f = fopen(filename, "r");
-    if(f == NULL){
-        printf("Khong mo duoc file!");
-        return;
+
+void showReaderList(ListReader l) {
+    for(NodeReader *i = l.head; i != NULL; i = i->next) {
+        printf("\n%s - %s", i->data.idSV, i->data.tenSV); 
+    } 
+}
+
+//============ BORROW ============
+void initBorrowList(ListBorrow *l) {
+    l->head = NULL; 
+}
+
+NodeBorrow *createBorrow(Borrow b) {
+    NodeBorrow *p = (NodeBorrow*)malloc(sizeof(NodeBorrow));
+    if(p == NULL) {
+        printf("cap phat vung nho khong thanh cong"); 
+    } else {
+        p->data = b;
+        p->next = NULL;
     }
-    Borrow b;
-    while(fscanf(f, "%[^|]|%[^|]|%[^|]|%[^\n]\n",
-        b.idSach,
-        b.idSinhVien,
-        b.ngayMuon,
-        b.ngayTra) != EOF){
-        insertBorrow(l, b);
+    return p; 
+}
+
+void insertBorrow(ListBorrow *l, Borrow b) {
+    NodeBorrow *p = createBorrow(b);
+    if(l->head == NULL) {
+        l->head = p; 
+        return; 
     }
-    fclose(f);
-    printf("Da doc file Borrow thanh cong!\n");
+
+    NodeBorrow *temp = l->head;
+    while(temp->next != NULL) {
+        temp = temp->next; 
+    }
+    temp->next = p; 
+}
+
+void showBorrowList(ListBorrow l) {
+    for(NodeBorrow *i = l.head; i != NULL; i = i->next) {
+        printf("\n%s - %s - %s - %s\n",
+               i->data.idSach,
+               i->data.idSinhVien,
+               i->data.ngayMuon,
+               i->data.ngayTra);
+    }
+}
+
+//============ MENU ============
+void menu(ListReader *lr, ListBorrow *lb) {
+    int choice;
+
+    do {
+        printf("\n========== MENU ==========\n");
+        printf("1. Them sach\n");
+        printf("2. Hien thi danh sach sach\n");
+        printf("3. Tim sach theo ID\n");
+        printf("4. Hien thi Reader\n");
+        printf("5. Hien thi Borrow\n");
+        printf("6. Muon sach\n");
+        printf("7. Them Reader\n");
+        printf("0. Thoat\n");
+        printf("Chon: ");
+
+        scanf("%d", &choice);
+        getchar();
+
+        switch(choice) {
+            case 1: {
+                int n;
+                printf("Nhap so sach: ");
+                scanf("%d", &n);
+                getchar();
+                themSach(n);
+                break;
+            }
+
+            case 2:
+                hienThi();
+                break;
+
+            case 3:
+                timTheoID();
+                break;
+
+            case 4:
+                showReaderList(*lr);
+                break;
+
+            case 5:
+                showBorrowList(*lb);
+                break;
+
+            case 6: {
+                    Borrow b;
+                    int idSach, found = 0;
+
+                    printf("Nhap ID sach: ");
+                    scanf("%d", &idSach);
+                    getchar();
+
+                    printf("Nhap ID sinh vien: ");
+                    scanf("%s", b.idSinhVien);
+                    getchar();
+
+                    printf("Nhap ngay muon: ");
+                    fgets(b.ngayMuon, sizeof(b.ngayMuon), stdin);
+                    b.ngayMuon[strcspn(b.ngayMuon, "\n")] = 0;
+
+                    printf("Nhap ngay tra: ");
+                    fgets(b.ngayTra, sizeof(b.ngayTra), stdin);
+                    b.ngayTra[strcspn(b.ngayTra, "\n")] = 0;
+
+                    for(int i = 0; i < h; i++) {
+                        if(ds[i].id == idSach) {
+                            found = 1;
+
+                            if(ds[i].soLuong > 0) {
+                                ds[i].soLuong--;
+                                sprintf(b.idSach, "%d", idSach);
+
+                                insertBorrow(lb, b);
+                                printf("Muon sach thanh cong!\n");
+                            } else {
+                                printf("Sach da het!\n");
+                            }
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        printf("Khong tim thay sach!\n");
+                    }
+
+                    break;
+            }
+            case 7:
+                themReader(lr);
+                break;
+            case 0:
+                printf("Thoat chuong trinh!\n");
+                break;
+
+            default:
+                printf("Lua chon khong hop le!\n");
+        }
+
+    } while(choice != 0);
+}
+
+int main() {
+    ListReader lr;
+    ListBorrow lb;
+
+    initReaderList(&lr);
+    initBorrowList(&lb);
+
+    menu(&lr, &lb);
+
+    return 0;
 }
