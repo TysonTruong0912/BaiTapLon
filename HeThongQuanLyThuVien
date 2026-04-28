@@ -1,6 +1,33 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#define CLEAR_SCREEN() system("cls")
+#define SET_COLOR(c) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), c)
+#define COLOR_WHITE    15
+#define COLOR_CYAN     11
+#define COLOR_YELLOW   14
+#define COLOR_GREEN    10
+#define COLOR_RED      12
+#define COLOR_GRAY      8
+#define COLOR_BLUE      9
+#define COLOR_MAGENTA  13
+#else
+#define CLEAR_SCREEN() system("clear")
+#define SET_COLOR(c)   printf("\033[%sm", c)
+#define COLOR_WHITE    "0;37"
+#define COLOR_CYAN     "0;36"
+#define COLOR_YELLOW   "0;33"
+#define COLOR_GREEN    "0;32"
+#define COLOR_RED      "0;31"
+#define COLOR_GRAY     "0;90"
+#define COLOR_BLUE     "0;34"
+#define COLOR_MAGENTA  "0;35"
+#endif
+
+/* ===== CAU TRUC DU LIEU ===== */
 
 typedef struct {
     int id;
@@ -8,72 +35,13 @@ typedef struct {
     int soLuong;
 } Sach;
 
-Sach ds[100];
-int h = 0;
-
-void themSach(int n) {
-    for(int i = 0; i < n; i++) {
-        printf("\nNhap ID: ");
-        scanf("%d", &ds[h].id);
-        getchar();
-
-        printf("Nhap ten sach: ");
-        fgets(ds[h].tensach, sizeof(ds[h].tensach), stdin);
-        ds[h].tensach[strcspn(ds[h].tensach, "\n")] = 0;
-
-        printf("Nhap so luong: ");
-        scanf("%d", &ds[h].soLuong);
-
-        h++;
-    }
-    printf("Them thanh cong!\n");
-}
-
-void hienThi() {
-    if(h == 0) {
-        printf("\nDanh sach rong!\n");
-        return;
-    }
-
-    printf("\n     DANH SACH SACH     \n");
-    for(int i = 0; i < h; i++) {
-        printf("\nID: %d", ds[i].id);
-        printf("\nTen sach: %s", ds[i].tensach);
-        printf("\nSo luong: %d\n", ds[i].soLuong);
-    }
-}
-
-void timTheoID() {
-    int id;
-    printf("\nNhap ID can tim: ");
-    scanf("%d", &id);
-
-    int tim = 0;
-
-    for(int i = 0; i < h; i++) {
-        if(ds[i].id == id) {
-            printf("\n    Sach tim thay    \n");
-            printf("ID: %d\n", ds[i].id);
-            printf("Ten: %s\n", ds[i].tensach);
-            printf("So luong: %d\n", ds[i].soLuong);
-            tim = 1;
-        }
-    }
-
-    if(tim == 0) {
-        printf("Khong tim thay sach!\n");
-    }
-}
-
-//===== MUON SACH =====
 typedef struct {
     char idSach[50];
     char idSinhVien[50];
     char ngayMuon[50];
-    char ngayTra[50]; 
+    char ngayTra[50];
 } Borrow;
 
-//===== NODE READER =====
 typedef struct {
     char idSV[50];
     char tenSV[100];
@@ -81,191 +49,549 @@ typedef struct {
 
 typedef struct NodeReader {
     Reader data;
-    struct NodeReader *next; 
+    struct NodeReader *next;
 } NodeReader;
 
-//===== NODE BORROW =====
 typedef struct NodeBorrow {
     Borrow data;
-    struct NodeBorrow *next; 
+    struct NodeBorrow *next;
 } NodeBorrow;
 
-//===== DANH SACH =====
 typedef struct {
-    NodeReader *head; 
+    NodeReader *head;
 } ListReader;
 
 typedef struct {
-    NodeBorrow *head; 
+    NodeBorrow *head;
 } ListBorrow;
 
-//============ READER ============
-void initReaderList(ListReader *l) {
-    l->head = NULL; 
+Sach ds[100];
+int h = 0;
+
+/* ===== HAM GIAO DIEN ===== */
+
+void inDuongNgang(int n) {
+    int i;
+    SET_COLOR(COLOR_GRAY);
+    for (i = 0; i < n; i++) printf("-");
+    printf("\n");
+    SET_COLOR(COLOR_WHITE);
 }
+
+void inDuongDon(int n) {
+    int i;
+    SET_COLOR(COLOR_GRAY);
+    for (i = 0; i < n; i++) printf("=");
+    printf("\n");
+    SET_COLOR(COLOR_WHITE);
+}
+
+void inTieuDe(const char *tieuDe) {
+    int len = (int)strlen(tieuDe);
+    int total = 56;
+    int pad = (total - len - 2) / 2;
+    int i;
+
+    printf("\n");
+    SET_COLOR(COLOR_CYAN);
+    printf("  +");
+    for (i = 0; i < total; i++) printf("-");
+    printf("+\n");
+
+    printf("  |");
+    for (i = 0; i < pad; i++) printf(" ");
+    SET_COLOR(COLOR_YELLOW);
+    printf("%s", tieuDe);
+    SET_COLOR(COLOR_CYAN);
+    for (i = 0; i < total - pad - len; i++) printf(" ");
+    printf("|\n");
+
+    printf("  +");
+    for (i = 0; i < total; i++) printf("-");
+    printf("+\n");
+    SET_COLOR(COLOR_WHITE);
+}
+
+void inTieuDeApp() {
+    int i;
+    CLEAR_SCREEN();
+    SET_COLOR(COLOR_CYAN);
+    printf("\n  +");
+    for (i = 0; i < 56; i++) printf("=");
+    printf("+\n");
+
+    printf("  |");
+    SET_COLOR(COLOR_YELLOW);
+    printf("          HE THONG QUAN LY THU VIEN              ");
+    SET_COLOR(COLOR_CYAN);
+    printf("      |\n");
+
+    printf("  |");
+    SET_COLOR(COLOR_GRAY);
+    printf("               Sinh Vien Quan Ly Sach              ");
+    SET_COLOR(COLOR_CYAN);
+    printf("    |\n");
+
+    printf("  +");
+    for (i = 0; i < 56; i++) printf("=");
+    printf("+\n");
+    SET_COLOR(COLOR_WHITE);
+}
+
+void inThongBao(const char *msg, int loai) {
+    printf("\n  ");
+    if (loai == 1) {
+        SET_COLOR(COLOR_GREEN);
+        printf("[OK] ");
+    } else if (loai == 0) {
+        SET_COLOR(COLOR_RED);
+        printf("[LOI] ");
+    } else {
+        SET_COLOR(COLOR_YELLOW);
+        printf("[!] ");
+    }
+    SET_COLOR(COLOR_WHITE);
+    printf("%s\n", msg);
+}
+
+void nhanPhimTiepTuc() {
+    SET_COLOR(COLOR_GRAY);
+    printf("\n  Nhan Enter de tiep tuc...");
+    SET_COLOR(COLOR_WHITE);
+    getchar();
+}
+
+/* ===== SACH ===== */
+
+void themSach(int n) {
+    int i;
+    inTieuDe("THEM SACH MOI");
+
+    for (i = 0; i < n; i++) {
+        printf("\n");
+        SET_COLOR(COLOR_CYAN);
+        printf("  --- Sach thu %d/%d ---\n", i + 1, n);
+        SET_COLOR(COLOR_WHITE);
+
+        printf("  Nhap ID       : ");
+        SET_COLOR(COLOR_YELLOW);
+        scanf("%d", &ds[h].id);
+        SET_COLOR(COLOR_WHITE);
+        getchar();
+
+        printf("  Nhap ten sach : ");
+        SET_COLOR(COLOR_YELLOW);
+        fgets(ds[h].tensach, sizeof(ds[h].tensach), stdin);
+        ds[h].tensach[strcspn(ds[h].tensach, "\n")] = 0;
+        SET_COLOR(COLOR_WHITE);
+
+        printf("  Nhap so luong : ");
+        SET_COLOR(COLOR_YELLOW);
+        scanf("%d", &ds[h].soLuong);
+        SET_COLOR(COLOR_WHITE);
+        getchar();
+
+        h++;
+    }
+    inThongBao("Them sach thanh cong!", 1);
+    nhanPhimTiepTuc();
+}
+
+void hienThiSach() {
+    int i;
+    inTieuDe("DANH SACH SACH");
+
+    if (h == 0) {
+        inThongBao("Danh sach trong!", 2);
+        nhanPhimTiepTuc();
+        return;
+    }
+
+    printf("\n");
+    SET_COLOR(COLOR_CYAN);
+    printf("  %-6s  %-35s  %-10s\n", "ID", "TEN SACH", "SO LUONG");
+    inDuongNgang(58);
+    SET_COLOR(COLOR_WHITE);
+
+    for (i = 0; i < h; i++) {
+        if (i % 2 == 0) SET_COLOR(COLOR_WHITE);
+        else SET_COLOR(COLOR_GRAY);
+
+        printf("  %-6d  %-35s  ", ds[i].id, ds[i].tensach);
+
+        if (ds[i].soLuong == 0) SET_COLOR(COLOR_RED);
+        else if (ds[i].soLuong <= 2) SET_COLOR(COLOR_YELLOW);
+        else SET_COLOR(COLOR_GREEN);
+
+        printf("%-10d\n", ds[i].soLuong);
+        SET_COLOR(COLOR_WHITE);
+    }
+
+    inDuongNgang(58);
+    SET_COLOR(COLOR_GRAY);
+    printf("  Tong cong: %d sach\n", h);
+    SET_COLOR(COLOR_WHITE);
+    nhanPhimTiepTuc();
+}
+
+void timTheoID() {
+    int id, tim, i;
+    inTieuDe("TIM SACH THEO ID");
+
+    printf("\n  Nhap ID can tim: ");
+    SET_COLOR(COLOR_YELLOW);
+    scanf("%d", &id);
+    SET_COLOR(COLOR_WHITE);
+    getchar();
+
+    tim = 0;
+
+    for (i = 0; i < h; i++) {
+        if (ds[i].id == id) {
+            printf("\n");
+            SET_COLOR(COLOR_GREEN);
+            printf("  +----------------------------------+\n");
+            printf("  |        KET QUA TIM KIEM          |\n");
+            printf("  +----------------------------------+\n");
+            SET_COLOR(COLOR_WHITE);
+            printf("  | ID       : ");
+            SET_COLOR(COLOR_YELLOW);
+            printf("%-22d|\n", ds[i].id);
+            SET_COLOR(COLOR_WHITE);
+            printf("  | Ten sach : ");
+            SET_COLOR(COLOR_YELLOW);
+            printf("%-22s|\n", ds[i].tensach);
+            SET_COLOR(COLOR_WHITE);
+            printf("  | So luong : ");
+            if (ds[i].soLuong == 0) SET_COLOR(COLOR_RED);
+            else SET_COLOR(COLOR_GREEN);
+            printf("%-22d|\n", ds[i].soLuong);
+            SET_COLOR(COLOR_WHITE);
+            SET_COLOR(COLOR_GREEN);
+            printf("  +----------------------------------+\n");
+            SET_COLOR(COLOR_WHITE);
+            tim = 1;
+        }
+    }
+
+    if (!tim) {
+        inThongBao("Khong tim thay sach voi ID nay!", 0);
+    }
+
+    nhanPhimTiepTuc();
+}
+
+/* ===== READER ===== */
+
+void initReaderList(ListReader *l) { l->head = NULL; }
 
 NodeReader *createReader(Reader r) {
     NodeReader *p = (NodeReader*)malloc(sizeof(NodeReader));
-    if(p == NULL) {
-        printf("cap phat vung nho khong thanh cong"); 
-    } else {
-        p->data = r;
-        p->next = NULL;
+    if (!p) {
+        printf("cap phat vung nho that bai!\n");
+        return NULL;
     }
-    return p; 
+    p->data = r;
+    p->next = NULL;
+    return p;
 }
 
 void insertReader(ListReader *l, Reader r) {
     NodeReader *p = createReader(r);
-    if(l->head == NULL) {
-        l->head = p; 
-        return; 
-    }
-
-    NodeReader *temp = l->head;
-    while(temp->next != NULL) {
-        temp = temp->next; 
-    }
-    temp->next = p; 
+    NodeReader *temp;
+    if (!p) return;
+    if (!l->head) { l->head = p; return; }
+    temp = l->head;
+    while (temp->next) temp = temp->next;
+    temp->next = p;
 }
 
 void themReader(ListReader *l) {
     char tiepTuc;
+    inTieuDe("THEM SINH VIEN (READER)");
+
     do {
         Reader r;
-
-        printf("\nNhap ID sinh vien: ");
+        printf("\n  Nhap ID sinh vien : ");
+        SET_COLOR(COLOR_YELLOW);
         fgets(r.idSV, sizeof(r.idSV), stdin);
         r.idSV[strcspn(r.idSV, "\n")] = 0;
+        SET_COLOR(COLOR_WHITE);
 
-        printf("Nhap ten sinh vien: ");
+        printf("  Nhap ten sinh vien: ");
+        SET_COLOR(COLOR_YELLOW);
         fgets(r.tenSV, sizeof(r.tenSV), stdin);
         r.tenSV[strcspn(r.tenSV, "\n")] = 0;
+        SET_COLOR(COLOR_WHITE);
 
         insertReader(l, r);
-        printf("Them Reader thanh cong! Tiep tuc them? (y/n): ");
+        inThongBao("Them Reader thanh cong!", 1);
+
+        printf("  Tiep tuc them? (y/n): ");
+        SET_COLOR(COLOR_YELLOW);
         scanf("%c", &tiepTuc);
+        SET_COLOR(COLOR_WHITE);
         getchar();
 
-    } while(tiepTuc == 'y' || tiepTuc == 'Y');
+    } while (tiepTuc == 'y' || tiepTuc == 'Y');
+
+    nhanPhimTiepTuc();
 }
 
 void showReaderList(ListReader l) {
-    for(NodeReader *i = l.head; i != NULL; i = i->next) {
-        printf("\n%s - %s", i->data.idSV, i->data.tenSV); 
-    } 
+    NodeReader *i;
+    int stt = 1;
+    inTieuDe("DANH SACH SINH VIEN");
+
+    if (!l.head) {
+        inThongBao("Chua co sinh vien nao!", 2);
+        nhanPhimTiepTuc();
+        return;
+    }
+
+    printf("\n");
+    SET_COLOR(COLOR_CYAN);
+    printf("  %-5s  %-15s  %-30s\n", "STT", "MA SV", "HO TEN");
+    inDuongNgang(58);
+    SET_COLOR(COLOR_WHITE);
+
+    for (i = l.head; i != NULL; i = i->next, stt++) {
+        if (stt % 2 == 0) SET_COLOR(COLOR_GRAY);
+        else SET_COLOR(COLOR_WHITE);
+        printf("  %-5d  %-15s  %-30s\n", stt, i->data.idSV, i->data.tenSV);
+    }
+
+    inDuongNgang(58);
+    SET_COLOR(COLOR_WHITE);
+    nhanPhimTiepTuc();
 }
 
-void deleteReader(ListReader *l, char id[]){
-	NodeReader *p = l->head;
-    NodeReader *previous = NULL; 
-	if(strcmp(p->data.idSV, id) == 0){
-		l->head = p->next;
-		free(p);
-		return; 
-	} 
-	while(p != NULL && strcmp(p->data.idSV, id) != 0){
-		previous = p;
-		p = p->next; 
-	} 
-	if(p == NULL){
-		printf("Khong tim thay phan tu de xoa");
-		return; 
-	} 
-	previous->next = p->next;
-	free(p); 
-} 
-//============ BORROW ============
-void initBorrowList(ListBorrow *l) {
-    l->head = NULL; 
-}
+/* ===== BORROW ===== */
+
+void initBorrowList(ListBorrow *l) { l->head = NULL; }
 
 NodeBorrow *createBorrow(Borrow b) {
     NodeBorrow *p = (NodeBorrow*)malloc(sizeof(NodeBorrow));
-    if(p == NULL) {
-        printf("cap phat vung nho khong thanh cong"); 
-    } else {
-        p->data = b;
-        p->next = NULL;
+    if (!p) {
+        printf("cap phat vung nho that bai!\n");
+        return NULL;
     }
-    return p; 
+    p->data = b;
+    p->next = NULL;
+    return p;
 }
 
 void insertBorrow(ListBorrow *l, Borrow b) {
     NodeBorrow *p = createBorrow(b);
-    if(l->head == NULL) {
-        l->head = p; 
-        return; 
-    }
-
-    NodeBorrow *temp = l->head;
-    while(temp->next != NULL) {
-        temp = temp->next; 
-    }
-    temp->next = p; 
+    NodeBorrow *temp;
+    if (!p) return;
+    if (!l->head) { l->head = p; return; }
+    temp = l->head;
+    while (temp->next) temp = temp->next;
+    temp->next = p;
 }
 
 void showBorrowList(ListBorrow l) {
-    for(NodeBorrow *i = l.head; i != NULL; i = i->next) {
-        printf("\n%s - %s - %s - %s\n",
+    NodeBorrow *i;
+    int stt = 1;
+    inTieuDe("DANH SACH MUON SACH");
+
+    if (!l.head) {
+        inThongBao("Chua co phieu muon nao!", 2);
+        nhanPhimTiepTuc();
+        return;
+    }
+
+    printf("\n");
+    SET_COLOR(COLOR_CYAN);
+    printf("  %-4s  %-8s  %-12s  %-12s  %-12s\n",
+           "STT", "ID SACH", "MA SV", "NGAY MUON", "NGAY TRA");
+    inDuongNgang(64);
+    SET_COLOR(COLOR_WHITE);
+
+    for (i = l.head; i != NULL; i = i->next, stt++) {
+        if (stt % 2 == 0) SET_COLOR(COLOR_GRAY);
+        else SET_COLOR(COLOR_WHITE);
+        printf("  %-4d  %-8s  %-12s  %-12s  %-12s\n",
+               stt,
                i->data.idSach,
                i->data.idSinhVien,
                i->data.ngayMuon,
                i->data.ngayTra);
     }
+
+    inDuongNgang(64);
+    SET_COLOR(COLOR_WHITE);
+    nhanPhimTiepTuc();
 }
 
-void deleteBorrow(ListBorrow *l, char idSV[]){
-	NodeBorrow *p = l->head;
-    NodeBorrow *previous = NULL; 
-	if(strcmp(p->data.idSinhVien, idSV) == 0){
-		l->head = p->next;
-		free(p);
-		return; 
-	} 
-	while(p != NULL && strcmp(p->data.idSinhVien, idSV) != 0){
-		previous = p;
-		p = p->next; 
-	} 
-	if(p == NULL){
-		printf("Khong tim thay phan tu can xoa");
-		return; 
-	} 
-	previous->next = p->next;
-	free(p); 
-} 
+void muonSach(ListBorrow *lb) {
+    Borrow b;
+    int idSach, found, i;
 
-//============ MENU ============
+    inTieuDe("MUON SACH");
+
+    printf("\n  Nhap ID sach      : ");
+    SET_COLOR(COLOR_YELLOW);
+    scanf("%d", &idSach);
+    SET_COLOR(COLOR_WHITE);
+    getchar();
+
+    printf("  Nhap ID sinh vien : ");
+    SET_COLOR(COLOR_YELLOW);
+    fgets(b.idSinhVien, sizeof(b.idSinhVien), stdin);
+    b.idSinhVien[strcspn(b.idSinhVien, "\n")] = 0;
+    SET_COLOR(COLOR_WHITE);
+
+    printf("  Nhap ngay muon    : ");
+    SET_COLOR(COLOR_YELLOW);
+    fgets(b.ngayMuon, sizeof(b.ngayMuon), stdin);
+    b.ngayMuon[strcspn(b.ngayMuon, "\n")] = 0;
+    SET_COLOR(COLOR_WHITE);
+
+    printf("  Nhap ngay tra     : ");
+    SET_COLOR(COLOR_YELLOW);
+    fgets(b.ngayTra, sizeof(b.ngayTra), stdin);
+    b.ngayTra[strcspn(b.ngayTra, "\n")] = 0;
+    SET_COLOR(COLOR_WHITE);
+
+    found = 0;
+    for (i = 0; i < h; i++) {
+        if (ds[i].id == idSach) {
+            found = 1;
+            if (ds[i].soLuong > 0) {
+                ds[i].soLuong--;
+                sprintf(b.idSach, "%d", idSach);
+                insertBorrow(lb, b);
+
+                printf("\n");
+                SET_COLOR(COLOR_GREEN);
+                printf("  +-------------------------------+\n");
+                printf("  |    MUON SACH THANH CONG       |\n");
+                printf("  +-------------------------------+\n");
+                SET_COLOR(COLOR_WHITE);
+                printf("  | Sach : %-22s|\n", ds[i].tensach);
+                printf("  | Con lai: %-21d|\n", ds[i].soLuong);
+                SET_COLOR(COLOR_GREEN);
+                printf("  +-------------------------------+\n");
+                SET_COLOR(COLOR_WHITE);
+            } else {
+                inThongBao("Sach da het! Khong the muon.", 0);
+            }
+            break;
+        }
+    }
+
+    if (!found) {
+        inThongBao("Khong tim thay sach voi ID nay!", 0);
+    }
+
+    nhanPhimTiepTuc();
+}
+
+/* ===== MENU ===== */
+
+void veMenu() {
+    int i;
+    inTieuDeApp();
+
+    printf("\n");
+    SET_COLOR(COLOR_CYAN);
+    printf("  +");
+    for (i = 0; i < 56; i++) printf("-");
+    printf("+\n");
+
+    SET_COLOR(COLOR_WHITE);
+    printf("  |  ");
+    SET_COLOR(COLOR_GREEN);
+    printf("[1]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Them sach                                       |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_GREEN);
+    printf("[2]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Hien thi danh sach sach                        |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_GREEN);
+    printf("[3]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Tim sach theo ID                               |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_BLUE);
+    printf("[4]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Hien thi danh sach sinh vien                   |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_BLUE);
+    printf("[5]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Hien thi danh sach phieu muon                  |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_YELLOW);
+    printf("[6]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Muon sach                                       |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_BLUE);
+    printf("[7]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Them sinh vien                                  |\n");
+
+    SET_COLOR(COLOR_CYAN);
+    printf("  +");
+    for (i = 0; i < 56; i++) printf("-");
+    printf("+\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_RED);
+    printf("[0]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Thoat chuong trinh                              ");
+    SET_COLOR(COLOR_CYAN);
+    printf("|\n");
+
+    printf("  +");
+    for (i = 0; i < 56; i++) printf("-");
+    printf("+\n");
+    SET_COLOR(COLOR_WHITE);
+
+    printf("\n  ");
+    SET_COLOR(COLOR_YELLOW);
+    printf("  Lua chon cua ban: ");
+    SET_COLOR(COLOR_WHITE);
+}
+
 void menu(ListReader *lr, ListBorrow *lb) {
     int choice;
+    int n;
 
     do {
-        printf("\n========== MENU ==========\n");
-        printf("1. Them sach\n");
-        printf("2. Hien thi danh sach sach\n");
-        printf("3. Tim sach theo ID\n");
-        printf("4. Hien thi Reader\n");
-        printf("5. Hien thi Borrow\n");
-        printf("6. Muon sach\n");
-        printf("7. Them Reader\n");
-        printf("0. Thoat\n");
-        printf("Chon: ");
-
+        veMenu();
         scanf("%d", &choice);
         getchar();
 
-        switch(choice) {
-            case 1: {
-                int n;
-                printf("Nhap so sach: ");
+        CLEAR_SCREEN();
+
+        switch (choice) {
+            case 1:
+                inTieuDe("THEM SACH MOI");
+                printf("\n  Nhap so luong sach can them: ");
+                SET_COLOR(COLOR_YELLOW);
                 scanf("%d", &n);
+                SET_COLOR(COLOR_WHITE);
                 getchar();
                 themSach(n);
                 break;
-            }
 
             case 2:
-                hienThi();
+                hienThiSach();
                 break;
 
             case 3:
@@ -280,61 +606,28 @@ void menu(ListReader *lr, ListBorrow *lb) {
                 showBorrowList(*lb);
                 break;
 
-            case 6: {
-                    Borrow b;
-                    int idSach, found = 0;
+            case 6:
+                muonSach(lb);
+                break;
 
-                    printf("Nhap ID sach: ");
-                    scanf("%d", &idSach);
-                    getchar();
-
-                    printf("Nhap ID sinh vien: ");
-                    scanf("%s", b.idSinhVien);
-                    getchar();
-
-                    printf("Nhap ngay muon: ");
-                    fgets(b.ngayMuon, sizeof(b.ngayMuon), stdin);
-                    b.ngayMuon[strcspn(b.ngayMuon, "\n")] = 0;
-
-                    printf("Nhap ngay tra: ");
-                    fgets(b.ngayTra, sizeof(b.ngayTra), stdin);
-                    b.ngayTra[strcspn(b.ngayTra, "\n")] = 0;
-
-                    for(int i = 0; i < h; i++) {
-                        if(ds[i].id == idSach) {
-                            found = 1;
-
-                            if(ds[i].soLuong > 0) {
-                                ds[i].soLuong--;
-                                sprintf(b.idSach, "%d", idSach);
-
-                                insertBorrow(lb, b);
-                                printf("Muon sach thanh cong!\n");
-                            } else {
-                                printf("Sach da het!\n");
-                            }
-                            break;
-                        }
-                    }
-
-                    if(!found) {
-                        printf("Khong tim thay sach!\n");
-                    }
-
-                    break;
-            }
             case 7:
                 themReader(lr);
                 break;
+
             case 0:
-                printf("Thoat chuong trinh!\n");
+                CLEAR_SCREEN();
+                SET_COLOR(COLOR_CYAN);
+                printf("\n\n  Cam on da su dung he thong!\n\n");
+                SET_COLOR(COLOR_WHITE);
                 break;
 
             default:
-                printf("Lua chon khong hop le!\n");
+                inThongBao("Lua chon khong hop le! Vui long chon lai.", 2);
+                nhanPhimTiepTuc();
+                break;
         }
 
-    } while(choice != 0);
+    } while (choice != 0);
 }
 
 int main() {
