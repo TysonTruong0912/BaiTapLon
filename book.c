@@ -49,7 +49,7 @@ void inTieuDe(const char *tieuDe) {
     SET_COLOR(COLOR_WHITE);
 }
 
-void inTieuDeApp() {
+void inTieuDeApp(void) {
     int i;
     CLEAR_SCREEN();
     SET_COLOR(COLOR_CYAN);
@@ -91,7 +91,7 @@ void inThongBao(const char *msg, int loai) {
     printf("%s\n", msg);
 }
 
-void nhanPhimTiepTuc() {
+void nhanPhimTiepTuc(void) {
     SET_COLOR(COLOR_GRAY);
     printf("\n  Nhan Enter de tiep tuc...");
     SET_COLOR(COLOR_WHITE);
@@ -134,7 +134,7 @@ void themSach(int n) {
     nhanPhimTiepTuc();
 }
 
-void hienThiSach() {
+void hienThiSach(void) {
     int i;
     inTieuDe("DANH SACH SACH");
 
@@ -171,7 +171,7 @@ void hienThiSach() {
     nhanPhimTiepTuc();
 }
 
-void timTheoID() {
+void timTheoID(void) {
     int id, tim, i;
     inTieuDe("TIM SACH THEO ID");
 
