@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-/* ===== PROTOTYPE HAM READER ===== */
+/* ===== HAM READER ===== */
 
 void        initReaderList    (ListReader *l);
 void        insertReader      (ListReader *l, Reader r);
