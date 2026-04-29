@@ -1,9 +1,10 @@
 #include "sach.h"
-#include "reader_borrow.h"
+#include "reader.h"
+#include "borrow.h"
 
 /* ===== MENU ===== */
 
-void veMenu() {
+static void veMenu(void) {
     int i;
     inTieuDeApp();
 
@@ -14,58 +15,54 @@ void veMenu() {
     printf("+\n");
 
     SET_COLOR(COLOR_WHITE);
-    printf("  |  ");
-    SET_COLOR(COLOR_GREEN);
-    printf("[1]");
-    SET_COLOR(COLOR_WHITE);
-    printf(" Them sach                                       |\n");
+    printf("  |  "); SET_COLOR(COLOR_GREEN);
+    printf("[1]");   SET_COLOR(COLOR_WHITE);
+    printf(" Them sach                                    |\n");
 
-    printf("  |  ");
-    SET_COLOR(COLOR_GREEN);
-    printf("[2]");
-    SET_COLOR(COLOR_WHITE);
-    printf(" Hien thi danh sach sach                        |\n");
+    printf("  |  "); SET_COLOR(COLOR_GREEN);
+    printf("[2]");   SET_COLOR(COLOR_WHITE);
+    printf(" Hien thi danh sach sach                     |\n");
 
-    printf("  |  ");
-    SET_COLOR(COLOR_GREEN);
-    printf("[3]");
-    SET_COLOR(COLOR_WHITE);
-    printf(" Tim sach theo ID                               |\n");
+    printf("  |  "); SET_COLOR(COLOR_GREEN);
+    printf("[3]");   SET_COLOR(COLOR_WHITE);
+    printf(" Tim sach theo ID                            |\n");
 
-    printf("  |  ");
-    SET_COLOR(COLOR_BLUE);
-    printf("[4]");
-    SET_COLOR(COLOR_WHITE);
-    printf(" Hien thi danh sach sinh vien                   |\n");
+    printf("  |  "); SET_COLOR(COLOR_BLUE);
+    printf("[4]");   SET_COLOR(COLOR_WHITE);
+    printf(" Hien thi danh sach sinh vien                |\n");
 
-    printf("  |  ");
-    SET_COLOR(COLOR_BLUE);
-    printf("[5]");
-    SET_COLOR(COLOR_WHITE);
-    printf(" Hien thi danh sach phieu muon                  |\n");
+    printf("  |  "); SET_COLOR(COLOR_BLUE);
+    printf("[5]");   SET_COLOR(COLOR_WHITE);
+    printf(" Hien thi danh sach phieu muon               |\n");
 
-    printf("  |  ");
-    SET_COLOR(COLOR_YELLOW);
-    printf("[6]");
-    SET_COLOR(COLOR_WHITE);
-    printf(" Muon sach                                       |\n");
+    printf("  |  "); SET_COLOR(COLOR_YELLOW);
+    printf("[6]");   SET_COLOR(COLOR_WHITE);
+    printf(" Muon sach                                    |\n");
 
-    printf("  |  ");
-    SET_COLOR(COLOR_BLUE);
-    printf("[7]");
-    SET_COLOR(COLOR_WHITE);
-    printf(" Them sinh vien                                  |\n");
+    printf("  |  "); SET_COLOR(COLOR_BLUE);
+    printf("[7]");   SET_COLOR(COLOR_WHITE);
+    printf(" Them sinh vien                               |\n");
+
+    printf("  |  "); SET_COLOR(COLOR_BLUE);
+    printf("[8]");   SET_COLOR(COLOR_WHITE);
+    printf(" Tim sinh vien theo Ma SV                    |\n");
+
+    printf("  |  "); SET_COLOR(COLOR_RED);
+    printf("[9]");   SET_COLOR(COLOR_WHITE);
+    printf(" Xoa sinh vien                                |\n");
+
+    printf("  |  "); SET_COLOR(COLOR_MAGENTA);
+    printf("[10]");  SET_COLOR(COLOR_WHITE);
+    printf(" Luu / Tai file sinh vien                    |\n");
 
     SET_COLOR(COLOR_CYAN);
     printf("  +");
     for (i = 0; i < 56; i++) printf("-");
     printf("+\n");
 
-    printf("  |  ");
-    SET_COLOR(COLOR_RED);
-    printf("[0]");
-    SET_COLOR(COLOR_WHITE);
-    printf(" Thoat chuong trinh                              ");
+    printf("  |  "); SET_COLOR(COLOR_RED);
+    printf("[0]");   SET_COLOR(COLOR_WHITE);
+    printf(" Thoat chuong trinh                          ");
     SET_COLOR(COLOR_CYAN);
     printf("|\n");
 
@@ -74,13 +71,13 @@ void veMenu() {
     printf("+\n");
     SET_COLOR(COLOR_WHITE);
 
-    printf("\n  ");
+    printf("\n    ");
     SET_COLOR(COLOR_YELLOW);
-    printf("  Lua chon cua ban: ");
+    printf("Lua chon cua ban: ");
     SET_COLOR(COLOR_WHITE);
 }
 
-void menu(ListReader *lr, ListBorrow *lb) {
+static void menu(ListReader *lr, ListBorrow *lb) {
     int choice;
     int n;
 
@@ -126,6 +123,18 @@ void menu(ListReader *lr, ListBorrow *lb) {
                 themReader(lr);
                 break;
 
+            case 8:
+                timReader(*lr);
+                break;
+
+            case 9:
+                xoaReader(lr);
+                break;
+
+            case 10:
+                luuVaDoc(lr);
+                break;
+
             case 0:
                 CLEAR_SCREEN();
                 SET_COLOR(COLOR_CYAN);
@@ -144,12 +153,14 @@ void menu(ListReader *lr, ListBorrow *lb) {
 
 /* ===== MAIN ===== */
 
-int main() {
+int main(void) {
     ListReader lr;
     ListBorrow lb;
 
     initReaderList(&lr);
     initBorrowList(&lb);
+
+    readReaderFromFile(&lr, "nguoimuon.txt");
 
     menu(&lr, &lb);
 
