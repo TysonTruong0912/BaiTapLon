@@ -1,6 +1,6 @@
 #include "reader.h"
 
-/* ===== HAM NOI ===== */
+/* ===== HAM NOI BO ===== */
 
 static NodeReader *createReader(Reader r) {
     NodeReader *p = (NodeReader*)malloc(sizeof(NodeReader));
