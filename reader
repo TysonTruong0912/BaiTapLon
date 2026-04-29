@@ -1,0 +1,155 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+//phan reader
+typedef struct{
+	char idSV[50];
+	char tenSV[50];
+}Reader;
+typedef struct NodeReader{
+	Reader data;
+    struct NodeReader *next; 
+} NodeReader;
+typedef struct{
+	NodeReader *head;
+}ListReader;
+void ReaderList(ListReader *l){
+	l->head=NULL;
+}
+NodeReader *createdReader(Reader r){
+	NodeReader *p=(NodeReader*)malloc(sizeof(NodeReader));
+	if(p==NULL){
+		printf("cap nhap vung nho khong thanh cong");
+	}
+	else{
+		p->data=r;
+		p->next=NULL;
+	}
+	return p;
+}
+void insertReader(ListReader *l,Reader r){
+	NodeReader *p =createdReader(r);
+	if(l->head==NULL){
+		l->head=p;
+	    return ;
+	}
+	NodeReader *tamthoi= l->head;
+	while(tamthoi->next!= NULL){
+		tamthoi = tamthoi->next;
+	}
+	tamthoi->next=p;
+}
+NodeReader *findReader(ListReader l,char id[]){
+	NodeReader *p=l.head;
+	while( p!=NULL){
+		if(strcmp(p->data.idSV,id)==0){
+			return p;
+		}
+		p=p->next;
+	}
+	return NULL;
+}
+void deleteReader(ListReader *l,char id[]){
+	NodeReader *p=l->head , *truoc=NULL;
+	if(p!=NULL && strcmp(p->data.idSV,id)==0){
+		l->head=p->next;
+	free(p);
+	printf("\nda xoa sinh vien co MSSV: %-10s\n",id);
+	return;
+}
+	while(p!=NULL && strcmp(p->data.idSV,id)!=0){
+		truoc=p;
+		p=p->next;
+	}
+	if(p==NULL){
+		printf("\nsinh vien co MSSV: %-10s khong ton tai\n",id);
+		return;
+	}
+	truoc->next=p->next;
+	free(p);
+	printf("\nda xoa sinh vien co MSSV: %-10s\n",id);
+}
+void writeReadertofile(ListReader l,char filename[]){
+	FILE *f=fopen(filename,"w");
+	if(f==NULL){
+		printf("khong mo duoc file!\n");
+		return;
+	}
+	for(NodeReader *p=l.head;p!=NULL;p=p->next){
+		fprintf(f,"%s | %s \n",p->data.tenSV, p->data.idSV);
+	}
+	fclose(f);
+	printf("da luu du lieu vao file %s thanh cong!\n",filename);
+}
+void readReaderfromfile(ListReader *l, char filename[]){
+	FILE *f=fopen(filename,"r");
+	if(f==NULL){
+		printf("file khong ton tai !\n");
+		return;
+	}
+	Reader r;
+	while(fscanf(f,"%[^|]|%[^\n]\n",r.tenSV,r.idSV)!= EOF){
+		insertReader(l,r);
+	}
+	fclose(f);
+	printf("da luuw du lieu voo file thanh cong!\n");
+}
+void showReaderlist(ListReader l){
+	if(l.head==NULL){
+		printf("danh sach sinh vien dang rong");
+		return;
+	}
+	printf("\n===Danh sach sinh vien dang muon sach tai thu vien===\n");
+	for(NodeReader *i=l.head;i != NULL; i=i->next){
+		printf("TenSV: %s | MSSV: %-10s\n",i->data.tenSV,i->data.idSV);
+	}
+}
+int main(){
+	ListReader dsSinhVien;
+    ReaderList(&dsSinhVien);
+    readReaderfromfile(&dsSinhVien, "nguoimuon.txt");
+
+    int chon;
+    Reader r;
+    char idTim[50];
+
+    do {
+        printf("\n========= MENU QUAN LY NGUOI MUON =========");
+        printf("\n1. Them sinh vien");
+        printf("\n2. Hien thi danh sach");
+        printf("\n3. Xoa sinh vien");
+        printf("\n0. Luu vao File va Thoat");
+        printf("\n===========================================");
+        printf("\nChon chuc nang: ");
+        scanf("%d", &chon);
+        getchar();
+
+        switch(chon) {
+            case 1:
+                printf("Nhap Ma SV: ");
+                gets(r.idSV); ");
+                gets(r.tenSV);
+                printf("Nhap Ten SV:
+                insertReader(&dsSinhVien, r);
+                printf("=> Them thanh cong!\n");
+                break;
+            case 2:
+                showReaderlist(dsSinhVien);
+                break;
+            case 3:
+                printf("Nhap Ma SV can xoa: ");
+                gets(idTim);
+                deleteReader(&dsSinhVien, idTim);
+                break;
+            case 0:
+                writeReadertofile(dsSinhVien, "nguoimuon.txt");
+                printf("Da thoat. Tam biet!\n");
+                break;
+            default:
+                printf("Lua chon khong hop le!\n");
+        }
+    } while(chon != 0);
+
+    return 0;
+}
+
