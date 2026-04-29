@@ -1,3 +1,9 @@
+/*
+ * HE THONG QUAN LY THU VIEN
+ * Giao dien console dep - Tieu chuan C89/C90
+ * Bien dich: Dev C++ (MinGW)
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -68,7 +74,7 @@ typedef struct {
 Sach ds[100];
 int h = 0;
 
-/* ===== HAM GIAO DIEN ===== */
+/* ===== HAM VE GIAO DIEN ===== */
 
 void inDuongNgang(int n) {
     int i;
@@ -306,6 +312,142 @@ void insertReader(ListReader *l, Reader r) {
     temp->next = p;
 }
 
+NodeReader *findReader(ListReader l, char id[]) {
+    NodeReader *p = l.head;
+    while (p != NULL) {
+        if (strcmp(p->data.idSV, id) == 0) return p;
+        p = p->next;
+    }
+    return NULL;
+}
+
+void timReader(ListReader l) {
+    char id[50];
+    NodeReader *p;
+    inTieuDe("TIM SINH VIEN THEO MA SV");
+
+    printf("\n  Nhap Ma SV can tim: ");
+    SET_COLOR(COLOR_YELLOW);
+    fgets(id, sizeof(id), stdin);
+    id[strcspn(id, "\n")] = 0;
+    SET_COLOR(COLOR_WHITE);
+
+    p = findReader(l, id);
+    if (p != NULL) {
+        printf("\n");
+        SET_COLOR(COLOR_GREEN);
+        printf("  +----------------------------------+\n");
+        printf("  |        KET QUA TIM KIEM          |\n");
+        printf("  +----------------------------------+\n");
+        SET_COLOR(COLOR_WHITE);
+        printf("  | Ma SV  : ");
+        SET_COLOR(COLOR_YELLOW);
+        printf("%-24s|\n", p->data.idSV);
+        SET_COLOR(COLOR_WHITE);
+        printf("  | Ho ten : ");
+        SET_COLOR(COLOR_YELLOW);
+        printf("%-24s|\n", p->data.tenSV);
+        SET_COLOR(COLOR_WHITE);
+        SET_COLOR(COLOR_GREEN);
+        printf("  +----------------------------------+\n");
+        SET_COLOR(COLOR_WHITE);
+    } else {
+        inThongBao("Khong tim thay sinh vien voi Ma SV nay!", 0);
+    }
+
+    nhanPhimTiepTuc();
+}
+
+void deleteReader(ListReader *l, char id[]) {
+    NodeReader *p = l->head;
+    NodeReader *truoc = NULL;
+
+    if (p != NULL && strcmp(p->data.idSV, id) == 0) {
+        l->head = p->next;
+        free(p);
+        inThongBao("Xoa sinh vien thanh cong!", 1);
+        return;
+    }
+
+    while (p != NULL && strcmp(p->data.idSV, id) != 0) {
+        truoc = p;
+        p = p->next;
+    }
+
+    if (p == NULL) {
+        inThongBao("Khong tim thay sinh vien voi Ma SV nay!", 0);
+        return;
+    }
+
+    truoc->next = p->next;
+    free(p);
+    inThongBao("Xoa sinh vien thanh cong!", 1);
+}
+
+void xoaReader(ListReader *l) {
+    char id[50];
+    inTieuDe("XOA SINH VIEN");
+
+    printf("\n  Nhap Ma SV can xoa: ");
+    SET_COLOR(COLOR_YELLOW);
+    fgets(id, sizeof(id), stdin);
+    id[strcspn(id, "\n")] = 0;
+    SET_COLOR(COLOR_WHITE);
+
+    deleteReader(l, id);
+    nhanPhimTiepTuc();
+}
+
+void writeReaderToFile(ListReader l, char filename[]) {
+    NodeReader *p;
+    FILE *f = fopen(filename, "w");
+    if (f == NULL) {
+        inThongBao("Khong mo duoc file de ghi!", 0);
+        return;
+    }
+    for (p = l.head; p != NULL; p = p->next) {
+        fprintf(f, "%s|%s\n", p->data.idSV, p->data.tenSV);
+    }
+    fclose(f);
+    inThongBao("Da luu du lieu sinh vien vao file thanh cong!", 1);
+}
+
+void readReaderFromFile(ListReader *l, char filename[]) {
+    Reader r;
+    FILE *f = fopen(filename, "r");
+    if (f == NULL) {
+        inThongBao("File chua ton tai, se tao moi khi luu.", 2);
+        return;
+    }
+    while (fscanf(f, "%49[^|]|%99[^\n]\n", r.idSV, r.tenSV) == 2) {
+        insertReader(l, r);
+    }
+    fclose(f);
+    inThongBao("Da tai du lieu sinh vien tu file thanh cong!", 1);
+}
+
+void luuVaDoc(ListReader *l) {
+    int chon;
+    inTieuDe("LUU / TAI FILE SINH VIEN");
+
+    printf("\n");
+    SET_COLOR(COLOR_CYAN);
+    printf("  [1] Luu danh sach sinh vien ra file\n");
+    printf("  [2] Tai danh sach sinh vien tu file\n");
+    printf("  [0] Quay lai\n");
+    SET_COLOR(COLOR_WHITE);
+    printf("\n  Chon: ");
+    SET_COLOR(COLOR_YELLOW);
+    scanf("%d", &chon);
+    SET_COLOR(COLOR_WHITE);
+    getchar();
+
+    if (chon == 1)      writeReaderToFile(*l, "nguoimuon.txt");
+    else if (chon == 2) readReaderFromFile(l, "nguoimuon.txt");
+
+    nhanPhimTiepTuc();
+}
+
 void themReader(ListReader *l) {
     char tiepTuc;
     inTieuDe("THEM SINH VIEN (READER)");
@@ -506,43 +648,61 @@ void veMenu() {
     SET_COLOR(COLOR_GREEN);
     printf("[1]");
     SET_COLOR(COLOR_WHITE);
-    printf(" Them sach                                       |\n");
+    printf(" Them sach                                    |\n");
 
     printf("  |  ");
     SET_COLOR(COLOR_GREEN);
     printf("[2]");
     SET_COLOR(COLOR_WHITE);
-    printf(" Hien thi danh sach sach                        |\n");
+    printf(" Hien thi danh sach sach                     |\n");
 
     printf("  |  ");
     SET_COLOR(COLOR_GREEN);
     printf("[3]");
     SET_COLOR(COLOR_WHITE);
-    printf(" Tim sach theo ID                               |\n");
+    printf(" Tim sach theo ID                            |\n");
 
     printf("  |  ");
     SET_COLOR(COLOR_BLUE);
     printf("[4]");
     SET_COLOR(COLOR_WHITE);
-    printf(" Hien thi danh sach sinh vien                   |\n");
+    printf(" Hien thi danh sach sinh vien                |\n");
 
     printf("  |  ");
     SET_COLOR(COLOR_BLUE);
     printf("[5]");
     SET_COLOR(COLOR_WHITE);
-    printf(" Hien thi danh sach phieu muon                  |\n");
+    printf(" Hien thi danh sach phieu muon               |\n");
 
     printf("  |  ");
     SET_COLOR(COLOR_YELLOW);
     printf("[6]");
     SET_COLOR(COLOR_WHITE);
-    printf(" Muon sach                                       |\n");
+    printf(" Muon sach                                    |\n");
 
     printf("  |  ");
     SET_COLOR(COLOR_BLUE);
     printf("[7]");
     SET_COLOR(COLOR_WHITE);
-    printf(" Them sinh vien                                  |\n");
+    printf(" Them sinh vien                               |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_BLUE);
+    printf("[8]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Tim sinh vien theo Ma SV                    |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_RED);
+    printf("[9]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Xoa sinh vien                                |\n");
+
+    printf("  |  ");
+    SET_COLOR(COLOR_MAGENTA);
+    printf("[10]");
+    SET_COLOR(COLOR_WHITE);
+    printf(" Luu / Tai file sinh vien                    |\n");
 
     SET_COLOR(COLOR_CYAN);
     printf("  +");
@@ -553,7 +713,7 @@ void veMenu() {
     SET_COLOR(COLOR_RED);
     printf("[0]");
     SET_COLOR(COLOR_WHITE);
-    printf(" Thoat chuong trinh                              ");
+    printf(" Thoat chuong trinh                          ");
     SET_COLOR(COLOR_CYAN);
     printf("|\n");
 
@@ -614,6 +774,18 @@ void menu(ListReader *lr, ListBorrow *lb) {
                 themReader(lr);
                 break;
 
+            case 8:
+                timReader(*lr);
+                break;
+
+            case 9:
+                xoaReader(lr);
+                break;
+
+            case 10:
+                luuVaDoc(lr);
+                break;
+
             case 0:
                 CLEAR_SCREEN();
                 SET_COLOR(COLOR_CYAN);
@@ -636,6 +808,8 @@ int main() {
 
     initReaderList(&lr);
     initBorrowList(&lb);
+
+    readReaderFromFile(&lr, "nguoimuon.txt");
 
     menu(&lr, &lb);
 
