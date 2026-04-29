@@ -75,13 +75,13 @@ typedef struct {
 extern Sach ds[100];
 extern int  h;
 
-/* ===== KHAI BAO HAM GIAO DIEN ===== */
+/* ===== PROTOTYPE HAM GIAO DIEN ===== */
 
-void inDuongNgang(int n);
-void inDuongDon(int n);
-void inTieuDe(const char *tieuDe);
-void inTieuDeApp(void);
-void inThongBao(const char *msg, int loai);
-void nhanPhimTiepTuc(void);
+void inDuongNgang    (int n);
+void inDuongDon      (int n);
+void inTieuDe        (const char *tieuDe);
+void inTieuDeApp     (void);
+void inThongBao      (const char *msg, int loai);
+void nhanPhimTiepTuc (void);
 
 #endif /* COMMON_H */
