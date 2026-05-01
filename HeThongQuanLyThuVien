@@ -68,6 +68,8 @@ typedef struct {
 Sach ds[100];
 int h = 0;
 
+void insertBorrow(ListBorrow *l, Borrow b);
+
 /* ===== HAM VE GIAO DIEN ===== */
 
 void inDuongNgang(int n) {
