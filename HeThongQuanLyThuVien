@@ -68,8 +68,6 @@ typedef struct {
 Sach ds[100];
 int h = 0;
 
-void insertBorrow(ListBorrow *l, Borrow b);
-
 /* ===== HAM VE GIAO DIEN ===== */
 
 void inDuongNgang(int n) {
@@ -394,89 +392,6 @@ void xoaReader(ListReader *l) {
     nhanPhimTiepTuc();
 }
 
-void writeToFile(ListReader l, ListBorrow lb, char filename[]) {
-    NodeReader *p;
-    NodeBorrow *q;
-    FILE *f = fopen(filename, "w");
-    if (f == NULL) {
-        inThongBao("Khong mo duoc file de ghi!", 0);
-        return;
-    }
-
-    fprintf(f, "[READER]\n");
-    for (p = l.head; p != NULL; p = p->next) {
-        fprintf(f, "%s|%s\n", p->data.idSV, p->data.tenSV);
-    }
-
-    fprintf(f, "[BORROW]\n");
-    for (q = lb.head; q != NULL; q = q->next) {
-        fprintf(f, "%s|%s|%s|%s\n",
-                q->data.idSach,
-                q->data.idSinhVien,
-                q->data.ngayMuon,
-                q->data.ngayTra);
-    }
-
-    fclose(f);
-    inThongBao("Da luu du lieu vao file thanh cong!", 1);
-}
-
-void readFile(ListReader *l, ListBorrow *lb, char filename[]) {
-    char line[200];
-    int section = 0; /* 0=Khong hop le, 1=READER, 2=BORROW */
-    FILE *f = fopen(filename, "r");
-    if (f == NULL) {
-        inThongBao("File chua ton tai, se tao moi khi luu.", 2);
-        return;
-    }
-
-    while (fgets(line, sizeof(line), f)) {
-        line[strcspn(line, "\n")] = 0; /* cat '\n' */
-
-        if (strcmp(line, "[READER]") == 0) { section = 1; continue; }
-        if (strcmp(line, "[BORROW]") == 0) { section = 2; continue; }
-        if (line[0] == '\0') continue; /* bo qua dong trong */
-
-        if (section == 1) {
-            Reader r;
-            if (sscanf(line, "%49[^|]|%99[^\n]", r.idSV, r.tenSV) == 2) {
-                insertReader(l, r);
-            }
-        } else if (section == 2) {
-            Borrow b;
-            if (sscanf(line, "%49[^|]|%49[^|]|%49[^|]|%49[^\n]",
-                       b.idSach, b.idSinhVien, b.ngayMuon, b.ngayTra) == 4) {
-                insertBorrow(lb, b);
-            }
-        }
-    }
-
-    fclose(f);
-    inThongBao("Da tai du lieu tu file thanh cong!", 1);
-}
-
-void luuVaDoc(ListReader *l, ListBorrow *lb) {
-    int chon;
-    inTieuDe("LUU / TAI FILE SINH VIEN");
-
-    printf("\n");
-    SET_COLOR(COLOR_CYAN);
-    printf("  [1] Luu danh sach ra file\n");
-    printf("  [2] Tai danh sach tu file\n");
-    printf("  [0] Quay lai\n");
-    SET_COLOR(COLOR_WHITE);
-    printf("\n  Chon: ");
-    SET_COLOR(COLOR_YELLOW);
-    scanf("%d", &chon);
-    SET_COLOR(COLOR_WHITE);
-    getchar();
-
-    if (chon == 1)      writeToFile(*l, *lb, "sinhvien.txt");
-    else if (chon == 2) readFile(l, lb, "sinhvien.txt");
-
-    nhanPhimTiepTuc();
-}
-
 void themReader(ListReader *l) {
     char tiepTuc;
     inTieuDe("THEM SINH VIEN (READER)");
@@ -735,6 +650,89 @@ void traSach(ListBorrow *lb) {
 
     if (!found)
         inThongBao("Khong tim thay phieu muon phu hop!", 0);
+
+    nhanPhimTiepTuc();
+}
+
+void writeToFile(ListReader l, ListBorrow lb, char filename[]) {
+    NodeReader *p;
+    NodeBorrow *q;
+    FILE *f = fopen(filename, "w");
+    if (f == NULL) {
+        inThongBao("Khong mo duoc file de ghi!", 0);
+        return;
+    }
+
+    fprintf(f, "[READER]\n");
+    for (p = l.head; p != NULL; p = p->next) {
+        fprintf(f, "%s|%s\n", p->data.idSV, p->data.tenSV);
+    }
+
+    fprintf(f, "[BORROW]\n");
+    for (q = lb.head; q != NULL; q = q->next) {
+        fprintf(f, "%s|%s|%s|%s\n",
+                q->data.idSach,
+                q->data.idSinhVien,
+                q->data.ngayMuon,
+                q->data.ngayTra);
+    }
+
+    fclose(f);
+    inThongBao("Da luu du lieu vao file thanh cong!", 1);
+}
+
+void readFile(ListReader *l, ListBorrow *lb, char filename[]) {
+    char line[200];
+    int section = 0; /* 0=Khong hop le, 1=READER, 2=BORROW */
+    FILE *f = fopen(filename, "r");
+    if (f == NULL) {
+        inThongBao("File chua ton tai, se tao moi khi luu.", 2);
+        return;
+    }
+
+    while (fgets(line, sizeof(line), f)) {
+        line[strcspn(line, "\n")] = 0; /* cat '\n' */
+
+        if (strcmp(line, "[READER]") == 0) { section = 1; continue; }
+        if (strcmp(line, "[BORROW]") == 0) { section = 2; continue; }
+        if (line[0] == '\0') continue; /* bo qua dong trong */
+
+        if (section == 1) {
+            Reader r;
+            if (sscanf(line, "%49[^|]|%99[^\n]", r.idSV, r.tenSV) == 2) {
+                insertReader(l, r);
+            }
+        } else if (section == 2) {
+            Borrow b;
+            if (sscanf(line, "%49[^|]|%49[^|]|%49[^|]|%49[^\n]",
+                       b.idSach, b.idSinhVien, b.ngayMuon, b.ngayTra) == 4) {
+                insertBorrow(lb, b);
+            }
+        }
+    }
+
+    fclose(f);
+    inThongBao("Da tai du lieu tu file thanh cong!", 1);
+}
+
+void luuVaDoc(ListReader *l, ListBorrow *lb) {
+    int chon;
+    inTieuDe("LUU / TAI FILE SINH VIEN");
+
+    printf("\n");
+    SET_COLOR(COLOR_CYAN);
+    printf("  [1] Luu danh sach ra file\n");
+    printf("  [2] Tai danh sach tu file\n");
+    printf("  [0] Quay lai\n");
+    SET_COLOR(COLOR_WHITE);
+    printf("\n  Chon: ");
+    SET_COLOR(COLOR_YELLOW);
+    scanf("%d", &chon);
+    SET_COLOR(COLOR_WHITE);
+    getchar();
+
+    if (chon == 1)      writeToFile(*l, *lb, "sinhvien.txt");
+    else if (chon == 2) readFile(l, lb, "sinhvien.txt");
 
     nhanPhimTiepTuc();
 }
