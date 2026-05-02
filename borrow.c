@@ -133,3 +133,82 @@ void muonSach(ListBorrow *lb) {
 
     nhanPhimTiepTuc();
 }
+
+void traSach(ListBorrow *lb) {
+    char idSinhVien[50];
+    char idSachStr[50];
+    int idSach;
+    NodeBorrow *p, *truoc;
+    int found, i;
+
+    inTieuDe("TRA SACH");
+
+    printf("\n  Nhap ID sach can tra : ");
+    SET_COLOR(COLOR_YELLOW);
+    scanf("%d", &idSach);
+    SET_COLOR(COLOR_WHITE);
+    getchar();
+
+    printf("  Nhap ID sinh vien    : ");
+    SET_COLOR(COLOR_YELLOW);
+    fgets(idSinhVien, sizeof(idSinhVien), stdin);
+    idSinhVien[strcspn(idSinhVien, "\n")] = 0;
+    SET_COLOR(COLOR_WHITE);
+
+    sprintf(idSachStr, "%d", idSach);
+
+    /* Tim phieu muon trung khop */
+    p     = lb->head;
+    truoc = NULL;
+    found = 0;
+
+    while (p != NULL) {
+        if (strcmp(p->data.idSach, idSachStr) == 0 &&
+            strcmp(p->data.idSinhVien, idSinhVien) == 0)
+        {
+            found = 1;
+
+            /* Tang so luong sach trong kho */
+            for (i = 0; i < h; i++) {
+                if (ds[i].id == idSach) {
+                    ds[i].soLuong++;
+                    break;
+                }
+            }
+
+            /* Xoa phieu muon khoi danh sach */
+            if (truoc == NULL)
+                lb->head = p->next;
+            else
+                truoc->next = p->next;
+            free(p);
+
+            printf("\n");
+            SET_COLOR(COLOR_GREEN);
+            printf("  +-------------------------------+\n");
+            printf("  |    TRA SACH THANH CONG        |\n");
+            printf("  +-------------------------------+\n");
+            SET_COLOR(COLOR_WHITE);
+            printf("  | ID Sach : %-20s|\n", idSachStr);
+            printf("  | Ma SV   : %-20s|\n", idSinhVien);
+            if (i < h) {
+                printf("  | Con lai : ");
+                SET_COLOR(COLOR_GREEN);
+                printf("%-20d", ds[i].soLuong);
+                SET_COLOR(COLOR_WHITE);
+                printf("|\n");
+            }
+            SET_COLOR(COLOR_GREEN);
+            printf("  +-------------------------------+\n");
+            SET_COLOR(COLOR_WHITE);
+            break;
+        }
+        truoc = p;
+        p     = p->next;
+    }
+
+    if (!found)
+        inThongBao("Khong tim thay phieu muon phu hop!", 0);
+
+    nhanPhimTiepTuc();
+}
