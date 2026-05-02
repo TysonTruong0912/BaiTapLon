@@ -9,5 +9,6 @@ void initBorrowList (ListBorrow *l);
 void insertBorrow   (ListBorrow *l, Borrow b);
 void showBorrowList (ListBorrow l);
 void muonSach       (ListBorrow *lb);
+void traSach        (ListBorrow *lb);
 
 #endif /* BORROW_H */
